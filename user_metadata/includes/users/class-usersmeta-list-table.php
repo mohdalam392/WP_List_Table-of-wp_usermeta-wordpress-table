@@ -99,7 +99,7 @@ class UsersMetaData_List_Table extends \WP_List_Table {
      */
     function get_sortable_columns() {
         $sortable_columns = array(
-            'umeta_id' => array( 'Meta Id', true ),
+            'umeta_id' => array( 'UMeta Id', true ),
             'user_id' => array( 'User Id', true ),
             'meta_key' => array( 'Meta Key', true ),
             'meta_value' => array( 'Meta Value', true ),
@@ -133,6 +133,27 @@ class UsersMetaData_List_Table extends \WP_List_Table {
         );
     }
 
+    public function extra_tablenav($which)
+    {
+        $umeta_id = sanitize_text_field( $_POST['umeta_id'] );
+        $user_id = sanitize_text_field( $_POST['user_id'] );
+        $meta_key = sanitize_text_field( $_POST['meta_key'] );
+        $meta_value = sanitize_text_field( $_POST['meta_value'] );
+    ?>
+        <div class="alignleft actions daterangeactions">
+            <form name='searchfilter'>
+                <label for="daterange-actions-picker" class="screen-reader-text"><?=__('Filter', 'iw-stats')?></label>
+                <input type="textfield" name="umeta_id" id="umeta_id" placeholder="UMeta Id" value="<?php echo $umeta_id ?>"/>
+                <input type="textfield" name="user_id" id="user_id" placeholder="User Id" value="<?php echo $user_id ?>"/>
+                <input type="textfield" name="meta_key" id="meta_key" placeholder="Meta Key" value="<?php echo $meta_key ?>"/>
+                <input type="textfield" name="meta_value" id="meta_value" placeholder="Meta Value" value="<?php echo $meta_value ?>"/>
+                <?php wp_nonce_field( '' ); ?>
+            <?php submit_button(__('Apply', 'iw-stats'), 'action', 'dodate', false); ?>
+            </form>
+        </div>
+        <?php
+    }
+
     /**
      * Set the views
      *
@@ -157,6 +178,11 @@ class UsersMetaData_List_Table extends \WP_List_Table {
      */
     function prepare_items() {
 
+        if (!empty($_POST) && ! wp_verify_nonce( $_POST['_wpnonce'], '' ) ) {
+            die( __( 'Are you cheating?', '' ) );
+        }
+
+        
         $columns               = $this->get_columns();
         $hidden                = array( );
         $sortable              = $this->get_sortable_columns();
@@ -181,6 +207,20 @@ class UsersMetaData_List_Table extends \WP_List_Table {
         if ( isset( $_REQUEST['s'] ) && !empty( $_REQUEST['s'] ) ) {
             $args['s'] = $_REQUEST['s'];
         }
+
+         if ( isset( $_POST['umeta_id'] ) && !empty( $_POST['umeta_id'] ) ) {
+            $args['umeta_id'] = sanitize_text_field($_POST['umeta_id']);
+        }
+        if ( isset( $_POST['user_id'] ) && !empty( $_POST['user_id'] ) ) {
+            $args['user_id'] = sanitize_text_field($_POST['user_id']);
+        }
+        if ( isset( $_POST['meta_key'] ) && !empty( $_POST['meta_key'] ) ) {
+            $args['meta_key'] = sanitize_text_field($_POST['meta_key']);
+        }
+        if ( isset( $_POST['meta_value'] ) && !empty( $_POST['meta_value'] ) ) {
+            $args['meta_value'] = sanitize_text_field($_POST['meta_value']);
+        }
+
 
         $this->items  = um_get_all_UserMeta( $args );
 

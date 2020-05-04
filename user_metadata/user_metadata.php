@@ -2,7 +2,7 @@
 /*
 Plugin Name: User Meta Data
 Plugin URI: 
-Description: 
+Description: User Meta Data List (Insert,Update,Delete)
 Author: Mohd Alam
 Version: 1.7.2
 Author URI: 

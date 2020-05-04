@@ -22,8 +22,25 @@ function um_get_all_UserMeta( $args = array() ) {
     $items     = wp_cache_get( $cache_key, '' );
 
     if ( false === $items ) {
+
         if(empty($args['s'])){
-            $items = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'usermeta ORDER BY umeta_id ' . $args['order'] .' LIMIT ' . $args['offset'] . ', ' . $args['number'] );
+            $query = 'SELECT * FROM ' . $wpdb->prefix . 'usermeta where 1=1 ';
+
+            if(!empty($args['umeta_id'])){
+                $query  .='and umeta_id="'.$args['umeta_id'].'" ';
+            }
+            if(!empty($args['user_id'])){
+                $query  .='and user_id="'.$args['user_id'].'" ';
+            }
+            if(!empty($args['meta_key'])){
+                $query  .='and meta_key="'.$args['meta_key'].'" ';
+            }
+            if(!empty($args['meta_value'])){
+                $query  .='and meta_value="'.$args['meta_value'].'" ';
+            }
+
+            $query  .='ORDER BY umeta_id ' . $args['order'] .' LIMIT ' . $args['offset'] . ', ' . $args['number'];
+             $items = $wpdb->get_results( $query );
         }else{
             $items = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'usermeta where user_id like "%'.$args['s'].'%" or meta_key like "%'.$args['s'].'%" or meta_value like "%'.$args['s'].'%" ORDER BY umeta_id ' . $args['order'] .' LIMIT ' . $args['offset'] . ', ' . $args['number'] );
         }
